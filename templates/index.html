@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>经济学曲线计算网站</title>
+    <!-- 可引入样式表 -->
+    <style>
+        /* 页面整体背景和字体美化 */
+        body {
+            font-family: '微软雅黑', Arial, sans-serif;
+            margin: 0;
+            background: #f4f7fa;
+            color: #222;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto 0 auto;
+            padding: 24px 32px 32px 32px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        h1 {
+            font-size: 2.3em;
+            font-weight: bold;
+            color: #2a6ae9;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 18px;
+        }
+        hr {
+            border: none;
+            border-top: 1.5px solid #e3e8ee;
+            margin: 24px 0 18px 0;
+        }
+        .card {
+            background: #fafdff;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(42,106,233,0.06);
+            padding: 22px 24px 18px 24px;
+            margin-bottom: 22px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+            margin-bottom: 6px;
+            color: #2a6ae9;
+            font-weight: 500;
+        }
+        input, select {
+            margin-bottom: 10px;
+            padding: 7px 12px;
+            border: 1.5px solid #c3d0e6;
+            border-radius: 7px;
+            outline: none;
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fff;
+        }
+        input:focus, select:focus {
+            border-color: #2a6ae9;
+            box-shadow: 0 0 0 2px #e3eefd;
+        }
+        .form-row {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        button[type="submit"] {
+            background: linear-gradient(90deg, #2a6ae9 60%, #4fd1c5 100%);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 32px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(42,106,233,0.08);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        button[type="submit"]:hover {
+            background: linear-gradient(90deg, #1d4ed8 60%, #38b2ac 100%);
+            box-shadow: 0 4px 16px rgba(42,106,233,0.13);
+        }
+        #result.card {
+            min-height: 48px;
+            font-size: 1.13em;
+            color: #1a202c;
+            background: #f6faff;
+            border-left: 4px solid #2a6ae9;
+            margin-bottom: 18px;
+            white-space: pre-line;
+        }
+      
+        /* 响应式布局 */
+        @media (max-width: 800px) {
+            .container { max-width: 98vw; padding: 10px 2vw; }
+            #chart { width: 98vw !important; min-width: 0; }
+        }
+        @media (max-width: 500px) {
+            h1 { font-size: 1.3em; }
+            .subtitle { font-size: 0.98em; }
+            label { width: 90px; font-size: 0.98em; }
+            input, select { font-size: 0.98em; }
+            button[type="submit"] { font-size: 1em; padding: 8px 16px; }
+        }
+    </style>
+    <!-- 曲线绘图区 -->
+    <div style="width: 200px; height: 10px; margin-top: 10px;"></div>
+    <!-- 引入ECharts库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>经济学曲线计算网站</h1>
+        <div class="subtitle">支持主流经济学曲线的参数计算与可视化</div>
+        <hr>
+        <!-- 多曲线输入区 -->
+        <div id="multi-curve-inputs"></div>
+        <button id="add-curve-btn" type="button" style="margin-bottom:18px;">添加一条曲线</button>
+        <form id="multi-curve-form" class="card">
+            <button type="submit">计算并绘制所有曲线</button>
+        </form>
+        <!-- 结果展示区 -->
+        <div id="result" class="card" style="margin-top:10px;"></div>
+        <!-- 曲线绘图区 -->
+        <div id="chart" class="card" style="width: 600px; height: 400px; margin-top: 10px;"></div>
+    </div>
+    <!-- 引入所有曲线计算逻辑 -->
+    <script src="/static/logic/demandCurve.js"></script>
+    <script src="/static/logic/supplyCurve.js"></script>
+    <script src="/static/logic/totalCostCurve.js"></script>
+    <script src="/static/logic/averageCostCurve.js"></script>
+    <script src="/static/logic/marginalCostCurve.js"></script>
+    <script src="/static/logic/averageRevenueCurve.js"></script>
+    <script src="/static/logic/marginalRevenueCurve.js"></script>
+    <script src="/static/logic/ppfCurve.js"></script>
+    <script src="/static/logic/isCurve.js"></script>
+    <script src="/static/logic/lmCurve.js"></script>
+    <script src="/static/logic/phillipsCurve.js"></script>
+    <script src="/static/logic/lafferCurve.js"></script>
+    <script src="/static/logic/lorenzCurve.js"></script>
+    <script src="/static/logic/engelCurve.js"></script>
+    <script src="/static/logic/kuznetsCurve.js"></script>
+    <script src="/static/logic/marginalProductCurve.js"></script>
+    <script src="/static/logic/averageProductCurve.js"></script>
+    <script src="/static/logic/learningCurve.js"></script>
+    <script src="/static/logic/experienceCurve.js"></script>
+    <script>
+        // 曲线类型与参数配置集中管理
+        const curveConfigs = {
+            demand: {
+                name: '需求曲线',
+                func: 'calculateDemand',
+                resultName: '需求量 Qd',
+                params: [
+                    { key: 'a', label: 'a（截距）', type: 'number' },
+                    { key: 'b', label: 'b（斜率）', type: 'number' },
+                    { key: 'P', label: 'P（价格）', type: 'number' }
+                ]
+            },
+            supply: {
+                name: '供给曲线',
+                func: 'calculateSupply',
+                resultName: '供给量 Qs',
+                params: [
+                    { key: 'c', label: 'c（截距）', type: 'number' },
+                    { key: 'd', label: 'd（斜率）', type: 'number' },
+                    { key: 'P', label: 'P（价格）', type: 'number' }
+                ]
+            },
+            totalCost: {
+                name: '总成本曲线',
+                func: 'calculateTotalCost',
+                resultName: '总成本 TC',
+                params: [
+                    { key: 'FC', label: 'FC（固定成本）', type: 'number' },
+                    { key: 'v', label: 'v（单位可变成本）', type: 'number' },
+                    { key: 'Q', label: 'Q（产量）', type: 'number' }
+                ]
+            },
+            averageCost: {
+                name: '平均成本曲线',
+                func: 'calculateAverageCost',
+                resultName: '平均成本 AC',
+                params: [
+                    { key: 'TC', label: 'TC（总成本）', type: 'number' },
+                    { key: 'Q', label: 'Q（产量）', type: 'number' }
+                ]
+            },
+            marginalCost: {
+                name: '边际成本曲线',
+                func: 'calculateMarginalCost',
+                resultName: '边际成本 MC',
+                params: [
+                    { key: 'TC1', label: 'TC1（Q1时总成本）', type: 'number' },
+                    { key: 'TC2', label: 'TC2（Q2时总成本）', type: 'number' },
+                    { key: 'Q1', label: 'Q1（产量1）', type: 'number' },
+                    { key: 'Q2', label: 'Q2（产量2）', type: 'number' }
+                ]
+            },
+            averageRevenue: {
+                name: '平均收益曲线',
+                func: 'calculateAverageRevenue',
+                resultName: '平均收益 AR',
+                params: [
+                    { key: 'TR', label: 'TR（总收益）', type: 'number' },
+                    { key: 'Q', label: 'Q（产量）', type: 'number' }
+                ]
+            },
+            marginalRevenue: {
+                name: '边际收益曲线',
+                func: 'calculateMarginalRevenue',
+                resultName: '边际收益 MR',
+                params: [
+                    { key: 'TR1', label: 'TR1（Q1时总收益）', type: 'number' },
+                    { key: 'TR2', label: 'TR2（Q2时总收益）', type: 'number' },
+                    { key: 'Q1', label: 'Q1（产量1）', type: 'number' },
+                    { key: 'Q2', label: 'Q2（产量2）', type: 'number' }
+                ]
+            },
+            ppf: {
+                name: '生产可能性边界（PPF）',
+                func: 'calculatePPF',
+                resultName: '商品Y最大产量 Y',
+                params: [
+                    { key: 'a', label: 'a（X资源消耗系数）', type: 'number' },
+                    { key: 'b', label: 'b（Y资源消耗系数）', type: 'number' },
+                    { key: 'R', label: 'R（总资源量）', type: 'number' },
+                    { key: 'X', label: 'X（商品X产量）', type: 'number' }
+                ]
+            },
+            is: {
+                name: 'IS曲线',
+                func: 'calculateIS',
+                resultName: '均衡收入 Y',
+                params: [
+                    { key: 'C0', label: 'C0（自发消费）', type: 'number' },
+                    { key: 'c', label: 'c（边际消费倾向）', type: 'number' },
+                    { key: 'Y', label: 'Y（收入）', type: 'number' },
+                    { key: 'T', label: 'T（税收）', type: 'number' },
+                    { key: 'I0', label: 'I0（自发投资）', type: 'number' },
+                    { key: 'i', label: 'i（投资对利率敏感度）', type: 'number' },
+                    { key: 'r', label: 'r（利率）', type: 'number' },
+                    { key: 'G', label: 'G（政府支出）', type: 'number' }
+                ]
+            },
+            lm: {
+                name: 'LM曲线',
+                func: 'calculateLM',
+                resultName: '均衡利率 r',
+                params: [
+                    { key: 'M', label: 'M（货币供给）', type: 'number' },
+                    { key: 'P', label: 'P（价格水平）', type: 'number' },
+                    { key: 'k', label: 'k（收入对货币需求敏感度）', type: 'number' },
+                    { key: 'h', label: 'h（利率对货币需求敏感度）', type: 'number' },
+                    { key: 'Y', label: 'Y（收入）', type: 'number' }
+                ]
+            },
+            phillips: {
+                name: '菲利普斯曲线',
+                func: 'calculatePhillips',
+                resultName: '通胀率 π',
+                params: [
+                    { key: 'pi_e', label: 'πe（预期通胀率）', type: 'number' },
+                    { key: 'beta', label: 'β（斜率）', type: 'number' },
+                    { key: 'u', label: 'u（实际失业率）', type: 'number' },
+                    { key: 'u_n', label: 'un（自然失业率）', type: 'number' }
+                ]
+            },
+            laffer: {
+                name: '拉弗曲线',
+                func: 'calculateLaffer',
+                resultName: '税收收入 T',
+                params: [
+                    { key: 't', label: 't（税率0~1）', type: 'number' },
+                    { key: 'B', label: 'B（税基）', type: 'number' }
+                ]
+            },
+            lorenz: {
+                name: '洛伦兹曲线',
+                func: 'calculateLorenz',
+                resultName: '洛伦兹曲线（累积人口比例/累积收入比例）',
+                params: [
+                    { key: 'incomes', label: 'incomes（收入数组,逗号分隔）', type: 'text' }
+                ]
+            },
+            engel: {
+                name: '恩格尔曲线',
+                func: 'calculateEngel',
+                resultName: '消费支出 E',
+                params: [
+                    { key: 'a', label: 'a（截距）', type: 'number' },
+                    { key: 'b', label: 'b（边际消费倾向）', type: 'number' },
+                    { key: 'Y', label: 'Y（收入）', type: 'number' }
+                ]
+            },
+            kuznets: {
+                name: '库兹涅茨曲线',
+                func: 'calculateKuznets',
+                resultName: '不平等程度 I',
+                params: [
+                    { key: 'a', label: 'a（系数）', type: 'number' },
+                    { key: 'b', label: 'b（系数）', type: 'number' },
+                    { key: 'Y', label: 'Y（人均收入）', type: 'number' }
+                ]
+            },
+            marginalProduct: {
+                name: '边际产量曲线',
+                func: 'calculateMarginalProduct',
+                resultName: '边际产量 MP',
+                params: [
+                    { key: 'Q1', label: 'Q1（L1时产量）', type: 'number' },
+                    { key: 'Q2', label: 'Q2（L2时产量）', type: 'number' },
+                    { key: 'L1', label: 'L1（劳动投入1）', type: 'number' },
+                    { key: 'L2', label: 'L2（劳动投入2）', type: 'number' }
+                ]
+            },
+            averageProduct: {
+                name: '平均产量曲线',
+                func: 'calculateAverageProduct',
+                resultName: '平均产量 AP',
+                params: [
+                    { key: 'Q', label: 'Q（产量）', type: 'number' },
+                    { key: 'L', label: 'L（劳动投入）', type: 'number' }
+                ]
+            },
+            learning: {
+                name: '学习曲线',
+                func: 'calculateLearning',
+                resultName: '单位成本 C',
+                params: [
+                    { key: 'a', label: 'a（初始单位成本）', type: 'number' },
+                    { key: 'b', label: 'b（学习指数b<0）', type: 'number' },
+                    { key: 'Q', label: 'Q（累计产量）', type: 'number' }
+                ]
+            },
+            experience: {
+                name: '经验曲线',
+                func: 'calculateExperience',
+                resultName: '单位成本 C',
+                params: [
+                    { key: 'a', label: 'a（初始单位成本）', type: 'number' },
+                    { key: 'b', label: 'b（经验指数b<0）', type: 'number' },
+                    { key: 'Q', label: 'Q（累计产量）', type: 'number' }
+                ]
+            }
+        };
+
+        // 曲线可视化配置集中管理（x轴变量、范围、步长）
+        // 可根据需要扩展每种曲线的x轴变量和取值范围
+        const curvePlotConfigs = {
+            demand:    { xKey: 'P', xLabel: '价格P', xMin: 0, xMax: 100, step: 1 },
+            supply:    { xKey: 'P', xLabel: '价格P', xMin: 0, xMax: 100, step: 1 },
+            totalCost: { xKey: 'Q', xLabel: '产量Q', xMin: 0, xMax: 100, step: 1 },
+            averageCost: { xKey: 'Q', xLabel: '产量Q', xMin: 1, xMax: 100, step: 1 },
+            marginalCost: { xKey: 'Q1', xLabel: '产量Q1', xMin: 1, xMax: 100, step: 1 },
+            averageRevenue: { xKey: 'Q', xLabel: '产量Q', xMin: 1, xMax: 100, step: 1 },
+            marginalRevenue: { xKey: 'Q1', xLabel: '产量Q1', xMin: 1, xMax: 100, step: 1 },
+            ppf: { xKey: 'X', xLabel: '商品X产量', xMin: 0, xMax: 100, step: 1 },
+            is: { xKey: 'Y', xLabel: '收入Y', xMin: 0, xMax: 1000, step: 10 },
+            lm: { xKey: 'Y', xLabel: '收入Y', xMin: 0, xMax: 1000, step: 10 },
+            phillips: { xKey: 'u', xLabel: '失业率u', xMin: 0, xMax: 0.2, step: 0.01 },
+            laffer: { xKey: 't', xLabel: '税率t', xMin: 0, xMax: 1, step: 0.01 },
+            lorenz: { xKey: 'incomes', xLabel: '人口累计比例', xMin: 0, xMax: 1, step: 0.01 },
+            engel: { xKey: 'Y', xLabel: '收入Y', xMin: 0, xMax: 1000, step: 10 },
+            kuznets: { xKey: 'Y', xLabel: '人均收入Y', xMin: 0, xMax: 1000, step: 10 },
+            marginalProduct: { xKey: 'L1', xLabel: '劳动投入L1', xMin: 1, xMax: 100, step: 1 },
+            averageProduct: { xKey: 'L', xLabel: '劳动投入L', xMin: 1, xMax: 100, step: 1 },
+            learning: { xKey: 'Q', xLabel: '累计产量Q', xMin: 1, xMax: 100, step: 1 },
+            experience: { xKey: 'Q', xLabel: '累计产量Q', xMin: 1, xMax: 100, step: 1 }
+        };
+
+        // 多曲线输入管理
+        let curveInputCount = 0;
+        const multiCurveInputsDiv = document.getElementById('multi-curve-inputs');
+        const multiCurveForm = document.getElementById('multi-curve-form');
+        const addCurveBtn = document.getElementById('add-curve-btn');
+
+        // 动态添加一组曲线输入
+        function addCurveInput(defaultKey) {
+            curveInputCount++;
+            const curveId = 'curve-' + curveInputCount;
+            // 创建卡片div
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.position = 'relative';
+            card.style.paddingTop = '16px';
+            card.id = curveId;
+            // 曲线类型选择
+            const typeRow = document.createElement('div');
+            typeRow.className = 'form-row';
+            const typeLabel = document.createElement('label');
+            typeLabel.textContent = '曲线类型:';
+            const typeSelect = document.createElement('select');
+            for (const key in curveConfigs) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = curveConfigs[key].name;
+                typeSelect.appendChild(opt);
+            }
+            typeSelect.value = defaultKey || Object.keys(curveConfigs)[0];
+            typeSelect.name = 'curveType';
+            typeSelect.style.marginRight = '12px';
+            typeRow.appendChild(typeLabel);
+            typeRow.appendChild(typeSelect);
+            card.appendChild(typeRow);
+            // 参数输入区
+            const paramDiv = document.createElement('div');
+            paramDiv.className = 'param-fields';
+            card.appendChild(paramDiv);
+            // 删除按钮
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.textContent = '删除';
+            delBtn.style.position = 'absolute';
+            delBtn.style.top = '10px';
+            delBtn.style.right = '18px';
+            delBtn.style.background = '#e53e3e';
+            delBtn.style.color = '#fff';
+            delBtn.style.border = 'none';
+            delBtn.style.borderRadius = '6px';
+            delBtn.style.padding = '3px 12px';
+            delBtn.style.cursor = 'pointer';
+            delBtn.onclick = () => {
+                multiCurveInputsDiv.removeChild(card);
+            };
+            card.appendChild(delBtn);
+            // 渲染参数输入
+            function renderParams() {
+                paramDiv.innerHTML = '';
+                const params = curveConfigs[typeSelect.value].params;
+                params.forEach(param => {
+                    const row = document.createElement('div');
+                    row.className = 'form-row';
+                    const label = document.createElement('label');
+                    label.htmlFor = curveId + '-' + param.key;
+                    label.textContent = param.label + ':';
+                    let input;
+                    if (param.type === 'text') {
+                        input = document.createElement('input');
+                        input.type = 'text';
+                    } else {
+                        input = document.createElement('input');
+                        input.type = 'number';
+                        input.step = 'any';
+                    }
+                    input.id = curveId + '-' + param.key;
+                    input.name = param.key;
+                    input.required = true;
+                    row.appendChild(label);
+                    row.appendChild(input);
+                    paramDiv.appendChild(row);
+                });
+            }
+            renderParams();
+            typeSelect.addEventListener('change', renderParams);
+            multiCurveInputsDiv.appendChild(card);
+        }
+
+        // 初始添加一条曲线输入
+        addCurveInput();
+        // 添加曲线按钮事件
+        addCurveBtn.onclick = () => addCurveInput();
+
+        // 多曲线统一计算与绘图
+        multiCurveForm.onsubmit = function(event) {
+            event.preventDefault();
+            const allCards = multiCurveInputsDiv.querySelectorAll('.card');
+            let hasError = false;
+            let results = [];
+            let series = [];
+            let legend = [];
+            allCards.forEach((card, idx) => {
+                const typeSelect = card.querySelector('select[name="curveType"]');
+                const curveKey = typeSelect.value;
+                const config = curveConfigs[curveKey];
+                const plotCfg = curvePlotConfigs[curveKey];
+                // 收集参数
+                let args = [];
+                config.params.forEach(param => {
+                    let input = card.querySelector('input[name="' + param.key + '"]');
+                    let value = input.value;
+                    if (param.type === 'number') {
+                        value = parseFloat(value);
+                        if (isNaN(value)) hasError = true;
+                    } else if (param.type === 'text') {
+                        value = value.split(',').map(s => parseFloat(s.trim())).filter(x => !isNaN(x));
+                        if (value.length === 0) hasError = true;
+                    }
+                    args.push(value);
+                });
+                if (hasError) return;
+                // 单点结果
+                let singleResult;
+                try {
+                    singleResult = window[config.func].apply(null, args);
+                } catch (e) {
+                    hasError = true;
+                    return;
+                }
+                results.push(`${config.name}：${typeof singleResult==='object'?JSON.stringify(singleResult):singleResult}`);
+                // 生成曲线数据
+                let xData = [], yData = [];
+                const xParamIdx = config.params.findIndex(p => p.key === plotCfg.xKey);
+                if (curveKey === 'lorenz') {
+                    const incomes = args[0];
+                    if (!Array.isArray(incomes) || incomes.length === 0) return;
+                    const sorted = incomes.slice().sort((a,b)=>a-b);
+                    const total = sorted.reduce((a,b)=>a+b,0);
+                    let cumPop = 0, cumIncome = 0;
+                    xData.push(0); yData.push(0);
+                    for (let i=0; i<sorted.length; i++) {
+                        cumPop += 1/sorted.length;
+                        cumIncome += sorted[i]/total;
+                        xData.push(Number(cumPop.toFixed(4)));
+                        yData.push(Number(cumIncome.toFixed(4)));
+                    }
+                } else {
+                    for (let x=plotCfg.xMin; x<=plotCfg.xMax; x+=plotCfg.step) {
+                        const paramCopy = args.slice();
+                        paramCopy[xParamIdx] = x;
+                        try {
+                            const y = window[config.func].apply(null, paramCopy);
+                            if (typeof y === 'number' && isFinite(y)) {
+                                xData.push(Number(x.toFixed(4)));
+                                yData.push(Number(y.toFixed(4)));
+                            }
+                        } catch (e) {}
+                    }
+                }
+                // 添加到series
+                series.push({
+                    name: config.name + (allCards.length>1?`(${idx+1})`:''),
+                    type: 'line',
+                    smooth: true,
+                    data: xData.map((x,i)=>[x, yData[i]]),
+                    showSymbol: false
+                });
+                legend.push(config.name + (allCards.length>1?`(${idx+1})`:''));
+            });
+            if (hasError || series.length===0) {
+                document.getElementById('result').innerText = '参数输入有误或计算出错，请检查！';
+                if (window.chartInstance) window.chartInstance.clear();
+                return;
+            }
+            // 展示所有单点结果
+            document.getElementById('result').innerText = results.join('\n');
+            // 绘制多曲线
+            if (!window.chartInstance) {
+                window.chartInstance = echarts.init(document.getElementById('chart'));
+            }
+            const option = {
+                title: { text: '多曲线对比分析', left: 'center' },
+                tooltip: { trigger: 'axis' },
+                legend: { data: legend, top: 30 },
+                xAxis: { name: '自变量', type: 'value' },
+                yAxis: { name: '因变量', type: 'value' },
+                series: series
+            };
+            window.chartInstance.setOption(option);
+        };
+    </script>
+</body>
+</html> 
